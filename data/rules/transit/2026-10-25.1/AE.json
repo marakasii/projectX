@@ -1,0 +1,100 @@
+{
+  "country": "AE",
+  "ruleset": {
+    "version": "transit:2026-10-25.1",
+    "rules": [
+      {
+        "id": "AE_TRANSIT_AIRSIDE",
+        "version": "transit:2026-10-25.1",
+        "scenario_id": "AE_TRANSIT",
+        "kind": "transit_airside",
+        "mandatory": true,
+        "source_ids": [
+          "AE_MOFA_MOSCOW"
+        ],
+        "parameters": {
+          "country": "AE",
+          "airports": [
+            "DXB"
+          ],
+          "citizenship": "RU",
+          "limitations": [
+            "Только совершеннолетний гражданин и резидент РФ с обычным загранпаспортом.",
+            "Не проверяются наличие рейса, посадочный талон, терминалы и минимальное время пересадки."
+          ]
+        }
+      },
+      {
+        "id": "AE_TRANSIT_ENTRY_RU",
+        "version": "transit:2026-10-25.1",
+        "scenario_id": "AE_TRANSIT",
+        "kind": "transit_entry_ru",
+        "mandatory": true,
+        "source_ids": [
+          "AE_MOFA_MOSCOW"
+        ],
+        "parameters": {
+          "country": "AE",
+          "airports": [
+            "DXB",
+            "DWC"
+          ],
+          "citizenship": "RU",
+          "limitations": [
+            "Только совершеннолетний гражданин и резидент РФ с обычным загранпаспортом.",
+            "Не проверяются наличие рейса, посадочный талон, терминалы и минимальное время пересадки."
+          ],
+          "passport_months": 6,
+          "stay_days": 90,
+          "window_days": 180
+        }
+      },
+      {
+        "id": "AE_TRANSIT_DXB_OPERATIONS",
+        "version": "transit:2026-10-25.1",
+        "scenario_id": "AE_TRANSIT",
+        "kind": "transit_operations",
+        "mandatory": true,
+        "source_ids": [
+          "AE_DXB_TRANSFERS"
+        ],
+        "parameters": {
+          "country": "AE",
+          "airports": [
+            "DXB"
+          ],
+          "citizenship": "RU",
+          "limitations": [
+            "Только совершеннолетний гражданин и резидент РФ с обычным загранпаспортом.",
+            "Не проверяются наличие рейса, посадочный талон, терминалы и минимальное время пересадки."
+          ],
+          "message": "Отдельные билеты DXB и получение багажа могут требовать паспортного контроля; смена DXB/DWC требует въезда. Уточните процедуру у перевозчика."
+        }
+      }
+    ],
+    "sources": [
+      {
+        "id": "AE_MOFA_MOSCOW",
+        "url": "https://www.mofa.gov.ae/en/Missions/Moscow/Contact-Form",
+        "authority": "Министерство иностранных дел ОАЭ, посольство в Москве",
+        "checked_at": "2026-10-25T14:04:15Z",
+        "review_after": "2026-11-01",
+        "status": "source_checked",
+        "locator": "FAQ: Inquiry regarding transit request; Visas / Mutual Visa Waiver Agreement",
+        "evidence": "Транзит без паспортного контроля допускается без предварительной визы. Для граждан РФ указан безвизовый въезд/транзит до 90 дней в 180 при паспорте с остатком не менее шести месяцев.",
+        "notes": "Предыдущие пребывания, право на границу и достаточность разрешений автоматически не устанавливаются."
+      },
+      {
+        "id": "AE_DXB_TRANSFERS",
+        "url": "https://dubaiairports.ae/information/transfers",
+        "authority": "Dubai Airports",
+        "checked_at": "2026-10-25T14:04:15Z",
+        "review_after": "2026-11-01",
+        "status": "source_checked",
+        "locator": "Baggage; Dubai World Central – Al Maktoum International (DWC)",
+        "evidence": "Для отдельных билетов DXB описаны получение багажа и паспортный контроль; смена DXB/DWC требует паспортного контроля и получения багажа.",
+        "notes": "Есть отдельный платный сервис передачи багажа, но приложение его не заказывает и не предполагает его использование. Терминалы, авиакомпании и время требуют уточнения."
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "status": "no_known_blockers",
+  "findings": [
+    {
+      "code": "airside_visa_not_required",
+      "severity": "info",
+      "message": "В покрытом случае без выхода из международной зоны транзитная виза не требуется.",
+      "next_action": "Подтвердите у перевозчика терминалы, посадочный талон, багаж и достаточность времени пересадки.",
+      "document_ids": [],
+      "field_paths": [
+        "route.transfers.0"
+      ],
+      "rule_ref": {
+        "id": "TR_TRANSIT_AIRSIDE",
+        "version": "transit:2026-10-25.1"
+      },
+      "source_refs": [
+        "TR_MFA_TRANSIT",
+        "TR_TK_IST"
+      ],
+      "origin": "rule",
+      "resolved": false
+    },
+    {
+      "code": "route_scope_limited",
+      "severity": "info",
+      "message": "Проверка охватывает только указанные транзитные условия. Наличие рейсов и допуск к перевозке не проверены.",
+      "next_action": "Проверьте расписание, терминалы, регистрацию, минимальное время и условия назначения у перевозчика.",
+      "document_ids": [],
+      "field_paths": [],
+      "rule_ref": null,
+      "source_refs": [],
+      "origin": "heuristic",
+      "resolved": false
+    }
+  ],
+  "covered_countries": [
+    "TR"
+  ],
+  "uncovered_countries": [],
+  "flight_availability": "not_checked"
+}

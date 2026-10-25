@@ -1,0 +1,32 @@
+{
+  "legs": [
+    {
+      "departure_country": "RU",
+      "arrival_country": "TR",
+      "departure_airport": "DME",
+      "arrival_airport": "IST",
+      "departure_at": "2026-11-01T06:00:00Z",
+      "arrival_at": "2026-11-01T10:00:00Z"
+    },
+    {
+      "departure_country": "TR",
+      "arrival_country": "FR",
+      "departure_airport": "IST",
+      "arrival_airport": "CDG",
+      "departure_at": "2026-11-01T12:00:00Z",
+      "arrival_at": "2026-11-01T15:00:00Z"
+    }
+  ],
+  "transfers": [
+    {
+      "country": "TR",
+      "airport": "IST",
+      "arrival_at": "2026-11-01T10:00:00Z",
+      "departure_at": "2026-11-01T12:00:00Z",
+      "ticket_type": "single",
+      "leaves_airside": false,
+      "rechecks_baggage": false,
+      "permissions": null
+    }
+  ]
+}

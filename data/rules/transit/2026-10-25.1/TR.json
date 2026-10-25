@@ -1,0 +1,87 @@
+{
+  "country": "TR",
+  "ruleset": {
+    "version": "transit:2026-10-25.1",
+    "rules": [
+      {
+        "id": "TR_TRANSIT_AIRSIDE",
+        "version": "transit:2026-10-25.1",
+        "scenario_id": "TR_TRANSIT",
+        "kind": "transit_airside",
+        "mandatory": true,
+        "source_ids": [
+          "TR_MFA_TRANSIT",
+          "TR_TK_IST"
+        ],
+        "parameters": {
+          "country": "TR",
+          "airports": [
+            "IST"
+          ],
+          "citizenship": "RU",
+          "limitations": [
+            "Только совершеннолетний гражданин и резидент РФ с обычным загранпаспортом.",
+            "Не проверяются наличие рейса, посадочный талон, терминалы и минимальное время пересадки."
+          ]
+        }
+      },
+      {
+        "id": "TR_TRANSIT_ENTRY_CONTEXT",
+        "version": "transit:2026-10-25.1",
+        "scenario_id": "TR_TRANSIT",
+        "kind": "transit_entry_context",
+        "mandatory": true,
+        "source_ids": [
+          "TR_MFA_ENTRY"
+        ],
+        "parameters": {
+          "country": "TR",
+          "airports": [
+            "IST"
+          ],
+          "citizenship": "RU",
+          "limitations": [
+            "Только совершеннолетний гражданин и резидент РФ с обычным загранпаспортом.",
+            "Не проверяются наличие рейса, посадочный талон, терминалы и минимальное время пересадки."
+          ],
+          "message": "Для паспорта РФ найден туристический/деловой безвизовый режим; применимость к выходу при этой пересадке и остальные условия въезда требуют проверки."
+        }
+      }
+    ],
+    "sources": [
+      {
+        "id": "TR_MFA_TRANSIT",
+        "url": "https://www.mfa.gov.tr/frequently-asked-questions.en.mfa",
+        "authority": "Министерство иностранных дел Турции",
+        "checked_at": "2026-10-25T14:04:15Z",
+        "review_after": "2026-11-01",
+        "status": "source_checked",
+        "locator": "Question: I will be flying to Europe; transit lounge",
+        "evidence": "При сохранении нахождения в транзитном зале аэропорта транзитная виза не требуется.",
+        "notes": "Только визовое условие. Выход, багаж, регистрация, перевозчики и минимальное время пересадки этим правилом не покрыты."
+      },
+      {
+        "id": "TR_TK_IST",
+        "url": "https://www.turkishairlines.com/en-sg/istanbul-airport/faq/",
+        "authority": "Turkish Airlines",
+        "checked_at": "2026-10-25T14:04:15Z",
+        "review_after": "2026-11-01",
+        "status": "source_checked",
+        "locator": "Questions About Transfer Passengers, question 4",
+        "evidence": "Для Istanbul Airport перевозчик указывает отсутствие требования визы при нахождении в транзитной зоне.",
+        "notes": "Подтверждение для IST; не доказывает возможность пересадки между любыми рейсами и терминалами."
+      },
+      {
+        "id": "TR_MFA_ENTRY",
+        "url": "https://www.mfa.gov.tr/visa-information-for-foreigners.en.mfa",
+        "authority": "Министерство иностранных дел Турции",
+        "checked_at": "2026-10-25T14:04:15Z",
+        "review_after": "2026-11-01",
+        "status": "source_checked",
+        "locator": "Russian Federation",
+        "evidence": "Для обычного паспорта РФ указан безвизовый режим до 60 дней для туристических и деловых поездок.",
+        "notes": "Контекст для ручной проверки выхода. Туристический режим не выдаётся за полное правило наземного транзита."
+      }
+    ]
+  }
+}

@@ -6,6 +6,23 @@
 Код написан в main по выбранному Ваней процессу; исходное дерево было чистым.
 Общие схемы, БД, app/main.py, данные стран и OpenAPI-снимок не менялись.
 
+## Интеграция с полученными пакетами 4/9
+
+После объединения ветки Матвея общий локальный запуск для 4/5/6/7/9:
+`python -m uvicorn app.itinerary.application:create_app --factory --workers 1`.
+Новый app/checks/integration.py содержит CaseCheckerAdapter и
+CaseChecksService: настоящее ядро 6 возвращает findings в подписи снимка
+CaseService, сохраняет route_revision и публикует через record_check.
+CRUD дел, архив и события здесь настоящие; старые тесты package6 ниже
+сохраняют самостоятельный режим со явно подготовленными строками дел.
+
+Для подключения к пакету 4 используется адаптер, а не прямой DocumentChecker:
+пакет 4 требует неизменную подпись своего снимка cases-v1, самостоятельный
+движок 6 формирует documents-1. Адаптер сначала проверяет результат ядра,
+затем возвращает его в исходной внешней подписи. Смена алгоритма документов
+и ежедневное устаревание при GET дела требуют учёта в выборе current_check
+владельцем 4; подробная передача — в app/itinerary/README.md.
+
 ## Что проверяется
 
 - Паспорт: подтверждение полей текущей ревизии, даты/хронология, истечение,
@@ -90,28 +107,11 @@ stale=1, stale_reason=checks_updated, projection_json=NULL. case_revision при
 создаются и не изменяются. История проверок сохраняется, GET берёт последний
 вставленный результат, даже когда два evaluated_at совпадают.
 
-Для пересчёта readiness после проверки подключить существующий протокол:
-
-```python
-from app.checks.service import ChecksService
-
-service = ChecksService(database, registry, document_archive, rebuilder=case_service)
-result = service.run(owner, case_id)
-# После commit: case_service.rebuild_case(owner, case_id, "checks_updated")
-```
-
-Пакет 4 также может вызывать чистый check_case(snapshot) внутри собственного
-rebuild_case. Не следует одновременно делать рекурсивный цикл
-rebuild_case -> service.run -> rebuild_case; внутри пересчёта используется
-чистое ядро. Findings с verify по обязательным полям/условиям не должны
-закрывать соответствующий пункт как satisfied. Общие coverage gaps также
-не позволяют объявлять полный пакет готовым. Блокировки/исправления и два
-независимых прогресса проецирует пакет 4, не этот модуль.
-
-Пока пакет 4 не подключён, сброшенная проекция остаётся stale; никаких
-фиктивных процентов/успешного пересчёта нет. В текущем репозитории CRUD дел
-ещё отсутствует: тесты явно создают временные строки дел в БД. Это не тест
-готовой реализации пакета 4.
+В самостоятельном режиме ChecksService поддерживает callback CaseRebuilder.
+Для фактического пакета 4 используйте CaseCheckerAdapter/CaseChecksService
+из раздела интеграции выше: CaseService.snapshot → адаптер → record_check →
+rebuild_case. Чистое ядро не вызывает сервис с записью, рекурсивного цикла нет.
+Готовность и процесс вычисляет пакет 4; coverage gaps сохраняются.
 
 ## HTTP, хранение и устаревание
 
@@ -141,24 +141,11 @@ GET выставляет stale, если изменились профиль, д
 .venv/bin/python -m uvicorn app.checks.application:create_app --factory --workers 1
 ```
 
-Этот локальный factory подключает 5+6 через публичный feature_routers общего
-create_app. Реальные 2/3/11 подключены самим Матвеем. Базовый app.main:app
-остаётся в зоне Матвея и пока не подключает 5/6 автоматически.
-
-Для общего composition root Матвею:
-
-```python
-from app.documents.router import router as documents_router
-from app.checks.router import router as checks_router
-
-app = create_app(feature_routers={5: documents_router, 6: checks_router})
-# После появления пакета 4:
-app.state.case_rebuilder = case_service
-```
-
-Если используется наш локальный factory, передать rebuilder в create_app:
-он будет передан обоим уже созданным сервисам. Никаких изменений DDL,
-общих моделей, форматов правил, методов или путей API для пакета 6 не нужно.
+Этот factory сохраняет самостоятельный режим хранения проверок 5+6.
+Основной app.main:app после пакетов 4/9 уже подключает 5, но ещё не 6/7.
+Для общей работы с делами используйте app.itinerary.application и адаптер
+из начала документа. Подключение через публичные порты не требует нового
+DDL или API DTO; точный код приведён в app/itinerary/README.md.
 
 ## Проверки и примеры CheckResult
 
@@ -169,7 +156,9 @@ TESSDATA_PREFIX="$PWD/local_data/tessdata" .venv/bin/python -m pytest -q
 .venv/bin/python -m app.common.export_openapi --check
 ```
 
-Фактически: **67 тестов пакета 6, 231 тест всего — passed, без пропусков**.
+На завершении исходного самостоятельного пакета 6: **67 его тестов,
+231 тест всего — passed, без пропусков**. После интеграции 4/9 актуальный
+общий результат приводится в отчёте пакета 7.
 Одно существующее предупреждение Starlette о TestClient/httpx. compileall,
 pip check и проверка общего OpenAPI-снимка прошли.
 
