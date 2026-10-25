@@ -42,7 +42,7 @@ def test_openapi_covers_contract_and_excludes_private_fields(client):
                 "$ref": "#/components/schemas/ErrorResponse"
             }
             if path != "/api/v1/health":
-                implemented = path.startswith(("/api/v1/auth/", "/api/v1/scenarios/")) or path in {"/api/v1/destinations", "/api/v1/profile", "/api/v1/comparisons"}
+                implemented = operation["x-package"] in {11, 2, 3, 4, 5, 9}
                 expected_state = "implemented" if implemented else "pending"
                 assert operation["x-implementation"] == expected_state
                 assert "503" in operation["responses"]

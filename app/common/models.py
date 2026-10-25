@@ -397,6 +397,7 @@ class DocumentFieldsPatch(Model):
 class ChecklistItem(Model):
     id: str
     requirement_id: str
+    title: str = ""
     kind: ChecklistKind
     mandatory: bool
     applicability: Applicability
@@ -462,6 +463,7 @@ class Case(Model):
     checklist: list[ChecklistItem]
     readiness: Readiness
     process: Process
+    applicability: ApplicabilityResult | None = None
     stale: bool
     stale_reason: str | None = None
     created_at: AwareDatetime
@@ -547,7 +549,7 @@ class Letter(Model):
 class EventCreate(Model):
     event_type: EventType
     occurred_at: AwareDatetime
-    note: str | None = None
+    note: Annotated[str, PydanticField(max_length=4000)] | None = None
     outcome: Outcome | None = None
 
 
