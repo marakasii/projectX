@@ -4,7 +4,16 @@
 
 ## Запуск
 
-Из корня репозитория:
+С backend из корня репозитория:
+
+```bash
+./scripts/run.sh
+```
+
+Откройте `http://127.0.0.1:8000`: сайт и API обслуживает один сервер.
+SAMPLE-аккаунты и отдельная БД: [runbook](../docs/runbook.md).
+
+Для просмотра только интерфейса без backend:
 
 ```bash
 python3 -m http.server 8000 --directory frontend

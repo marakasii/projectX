@@ -11,6 +11,10 @@ class FrontendFiles(StaticFiles):
     async def get_response(self, path, scope):
         # Unknown API/private URLs must never receive a successful SPA page.
         if path.split("/", 1)[0] in {"api", "local_data", ".env", ".git", ".runtime", "docs", "redoc", "openapi.json"}:
+            from starlette.routing import Match
+            for route in scope['app'].routes:
+                if getattr(route, 'methods', None) and route.matches(scope)[0] == Match.PARTIAL:
+                    raise HTTPException(405, headers={'Allow': ', '.join(sorted(route.methods))})
             raise HTTPException(404)
         try:
             return await super().get_response(path, scope)
@@ -24,6 +28,8 @@ def install_web(application, settings):
     directory = settings.frontend_dist
     if directory is None:
         candidate = Path("frontend/dist")
+        if not (candidate / "index.html").is_file():
+            candidate = Path("frontend")
         directory = candidate if (candidate / "index.html").is_file() else None
     if directory is not None:
         directory = directory.resolve()

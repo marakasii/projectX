@@ -242,3 +242,25 @@ VISAPILOT_FRONTEND_DIST. При отсутствии сборки / открыв
 эти веб-маршруты не входят в API-снимок. Приватные данные не публикуются
 как статика. Полные примеры и границы готовности:
 [cases-events-handoff.md](cases-events-handoff.md).
+
+## Конкретизация пакетов 6/8 и интеграции 10
+
+В общем app.main теперь подключены реальные checks и letters. Пакет 7 остаётся
+pending/503. Проверки используют единый CaseService.snapshot/record_check,
+algorithm_version=documents-1 и route_revision; после изменения входов старый
+результат не становится актуальным. Все реальные страны пока partial.
+
+Письма: POST/GET /cases/{case_id}/letters, PATCH /letters/{letter_id} и
+GET /letters/{letter_id}/file реализованы с ownership, CSRF для записи и no-store.
+PATCH content — 1–32000 символов. POST возвращает 201 и новый ID либо актуальную
+неизменённую версию с from_cache=true. Правки пользователя не перезаписываются.
+Список упорядочен от старого к новому. Stale-письмо можно экспортировать как
+сохранённую версию; download сообщает X-Letter-Stale и UTF-8 text/plain attachment.
+Версия шаблона/модель включены в algorithm_version подписи письма letters-1-…;
+остальные ревизии совпадают с входами дела. Даже при совпадающей подписи
+stale запрещает кэш. По умолчанию AI отключён, template обозначен явно.
+
+Frontend обслуживается из frontend/dist, затем frontend/, либо явного
+VISAPILOT_FRONTEND_DIST. Полные границы, AI-композиция и передача Ване:
+[letters-integration-handoff.md](letters-integration-handoff.md).
+Команды отдельного демокабинета и воспроизводимые проверки: [runbook.md](runbook.md).

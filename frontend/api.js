@@ -57,7 +57,7 @@ export class ApiClient {
   deleteDocument(id) { return this.request(`/documents/${encodeURIComponent(id)}`, { method:'DELETE' }); }
   uploadDocument(file, documentType) { const body = new FormData(); body.append('file', file); body.append('document_type', documentType); return this.request('/documents', { method:'POST', body }); }
   extractDocument(id) { return this.request(`/documents/${encodeURIComponent(id)}/extract`, { method:'POST' }); }
-  updateFields(id, fields) { return this.request(`/documents/${encodeURIComponent(id)}/fields`, { method:'PATCH', body:{ fields } }); }
+  updateFields(id, fields, revision) { return this.request(`/documents/${encodeURIComponent(id)}/fields`, { method:'PATCH', body:{ expected_facts_revision: revision, fields: fields.map(({key,value,user_confirmed}) => ({key,value,user_confirmed})) } }); }
   runChecks(caseId) { return this.request(`/cases/${encodeURIComponent(caseId)}/checks`, { method:'POST' }); }
   checks(caseId) { return this.request(`/cases/${encodeURIComponent(caseId)}/checks`); }
   saveRoute(caseId, route) { return this.request(`/cases/${encodeURIComponent(caseId)}/route`, { method:'PUT', body:route }); }
