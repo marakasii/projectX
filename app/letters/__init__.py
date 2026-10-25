@@ -1,0 +1,1 @@
+"""Owned cover-letter drafts."""

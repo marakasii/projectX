@@ -1725,6 +1725,8 @@
         "additionalProperties": false,
         "properties": {
           "content": {
+            "maxLength": 32000,
+            "minLength": 1,
             "title": "Content",
             "type": "string"
           }
@@ -2906,7 +2908,7 @@
     }
   },
   "info": {
-    "description": "Локальное демо на вымышленных документах. Работают аккаунты, 12 направлений, профиль/сравнения, дела, архив и ручная хронология (пакеты 1/11/2/3/4/5/9); остальные маршруты документируют контракт и отвечают 503 после входа до реализации. Frontend использует один origin и credentials=include.",
+    "description": "Локальное демо на вымышленных документах. Работают аккаунты, 12 направлений, профиль/сравнения, дела, архив, проверки, письма и ручная хронология (пакеты 1/11/2/3/4/5/6/8/9); Маршрут/транзит (пакет 7) отвечает 503 после входа до подключения. Frontend использует один origin и credentials=include.",
     "title": "VisaPilot API",
     "version": "0.1.0"
   },
@@ -4279,8 +4281,7 @@
     },
     "/api/v1/cases/{case_id}/checks": {
       "get": {
-        "description": "Контракт пакета 6. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "checks_api_v1_cases__case_id__checks_get",
+        "operationId": "get_case_checks_api_v1_cases__case_id__checks_get",
         "parameters": [
           {
             "in": "path",
@@ -4400,16 +4401,15 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Checks",
+        "summary": "Get Case Checks",
         "tags": [
           "checks"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 6
       },
       "post": {
-        "description": "Контракт пакета 6. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "check_case_api_v1_cases__case_id__checks_post",
+        "operationId": "run_checks_api_v1_cases__case_id__checks_post",
         "parameters": [
           {
             "in": "path",
@@ -4545,11 +4545,11 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Check Case",
+        "summary": "Run Checks",
         "tags": [
           "checks"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 6
       }
     },
@@ -5142,8 +5142,7 @@
     },
     "/api/v1/cases/{case_id}/letters": {
       "get": {
-        "description": "Контракт пакета 8. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "letters_api_v1_cases__case_id__letters_get",
+        "operationId": "listing_api_v1_cases__case_id__letters_get",
         "parameters": [
           {
             "in": "path",
@@ -5263,16 +5262,15 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Letters",
+        "summary": "Listing",
         "tags": [
           "letters"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 8
       },
       "post": {
-        "description": "Контракт пакета 8. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "create_letter_api_v1_cases__case_id__letters_post",
+        "operationId": "generate_api_v1_cases__case_id__letters_post",
         "parameters": [
           {
             "in": "path",
@@ -5418,11 +5416,11 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Create Letter",
+        "summary": "Generate",
         "tags": [
           "letters"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 8
       }
     },
@@ -7209,8 +7207,7 @@
     },
     "/api/v1/letters/{letter_id}": {
       "patch": {
-        "description": "Контракт пакета 8. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "update_letter_api_v1_letters__letter_id__patch",
+        "operationId": "edit_api_v1_letters__letter_id__patch",
         "parameters": [
           {
             "in": "path",
@@ -7356,18 +7353,17 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Update Letter",
+        "summary": "Edit",
         "tags": [
           "letters"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 8
       }
     },
     "/api/v1/letters/{letter_id}/file": {
       "get": {
-        "description": "Контракт пакета 8. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "download_letter_api_v1_letters__letter_id__file_get",
+        "operationId": "download_api_v1_letters__letter_id__file_get",
         "parameters": [
           {
             "in": "path",
@@ -7383,14 +7379,9 @@
         "responses": {
           "200": {
             "content": {
-              "text/plain": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
+              "text/plain": {}
             },
-            "description": "Защищённое скачивание после реализации пакета"
+            "description": "Successful Response"
           },
           "401": {
             "content": {
@@ -7488,11 +7479,11 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Download Letter",
+        "summary": "Download",
         "tags": [
           "letters"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 8
       }
     },

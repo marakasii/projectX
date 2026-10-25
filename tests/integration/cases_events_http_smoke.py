@@ -1,7 +1,6 @@
-"""One real server: 1/11/2/3/4/5/9, same-origin frontend fixture and restart.
+"""One real server with actual frontend, checks, letters and restart.
 
-The temporary HTML is a hosting fixture, not the team's frontend. Packages
-6/7/8 are explicitly unavailable; no test checker or AI is injected here.
+Package 7 remains unavailable; no test checker or AI is injected here.
 """
 
 import socket
@@ -24,14 +23,12 @@ def main():
     origin = f"http://127.0.0.1:{port}"
     with tempfile.TemporaryDirectory(prefix="visapilot-cases-events-") as directory:
         data = str(Path(directory) / "data")
-        build = Path(directory) / "frontend-build"
-        build.mkdir()
-        (build / "index.html").write_text('<!doctype html><title>SAMPLE frontend hosting fixture</title>')
-        env = {"VISAPILOT_FRONTEND_DIST": str(build)}
+        env = {"VISAPILOT_FRONTEND_DIST": str(ROOT / "frontend"), "VISAPILOT_AI_ENABLED": "false"}
         with httpx.Client(base_url=origin, headers={"Origin": origin}, timeout=30, trust_env=False) as alice, \
                 httpx.Client(base_url=origin, headers={"Origin": origin}, timeout=30, trust_env=False) as bob:
             with server(port, data, environment_overrides=env):
-                assert "SAMPLE frontend hosting fixture" in alice.get("/").text
+                assert "<html" in alice.get("/").text
+                assert alice.get("/app.js").status_code == 200
                 assert alice.get("/docs").status_code == 200
                 ah, bh = sign_in(alice, "sample_alice"), sign_in(bob, "sample_bob")
                 assert alice.put("/api/v1/profile", headers=ah, json=SAMPLE_PROFILE).status_code == 200
@@ -64,9 +61,19 @@ def main():
                 attached = alice.put(case_url + "/documents/" + document["id"], headers=ah)
                 assert attached.status_code == 200, attached.text
                 assert not attached.json()["readiness"]["ready"]
-                for suffix in ("/checks", "/route/check", "/letters"):
-                    kwargs = {"json": {}} if suffix == "/letters" else {}
-                    assert alice.post(case_url + suffix, headers=ah, **kwargs).status_code == 503
+                checks = alice.post(case_url + "/checks", headers=ah)
+                assert checks.status_code == 200 and not checks.json()["stale"], checks.text
+                assert checks.json()["input_signature"]["algorithm_version"] == "documents-1"
+                assert bob.get(case_url + "/checks").status_code == 404
+                assert alice.post(case_url + "/route/check", headers=ah).status_code == 503
+                generated = alice.post(case_url + "/letters", headers=ah, json={})
+                assert generated.status_code == 201, generated.text
+                letter = generated.json()
+                assert letter["generation_mode"] == "template" and not letter["stale"]
+                letter_url = "/api/v1/letters/" + letter["id"]
+                assert alice.patch(letter_url, headers=ah, json={"content": "SAMPLE edited draft. Примечание."}).status_code == 200
+                assert alice.get(letter_url + "/file").content.decode("utf-8") == "SAMPLE edited draft. Примечание."
+                assert bob.get(letter_url + "/file").status_code == 404
                 assert alice.post(case_url + "/events", json={"event_type": "submitted", "occurred_at": "2026-10-01T10:00:00Z"}).status_code == 403
                 returned = alice.post(case_url + "/events", headers=ah, json={"event_type": "passport_returned", "occurred_at": "2026-10-01T10:00:00Z"})
                 assert returned.status_code == 201
@@ -86,6 +93,9 @@ def main():
                 assert alice.get(case_url).json()["process"]["outcome"] == "refused"
                 assert len(alice.get(case_url + "/events").json()["items"]) == 2
                 assert alice.get(doc_url + "/file").content == sample
+                stored = alice.get(case_url + "/letters").json()["items"][0]
+                assert stored["edited_by_user"] and stored["stale"]
+                assert stored["content"] == "SAMPLE edited draft. Примечание."
                 assert alice.delete(doc_url, headers=ah).status_code == 204
                 assert alice.get(case_url).json()["attached_document_ids"] == []
                 assert not alice.get(case_url).json()["readiness"]["ready"]
@@ -93,7 +103,7 @@ def main():
                 assert alice.get(case_url).status_code == 404
                 assert alice.post("/api/v1/auth/logout", headers=ah).status_code == 204
                 assert alice.get("/api/v1/cases").status_code == 401
-    print("HTTP application smoke passed: 12 cases, shared archive/extraction, ownership/CSRF, timeline/outcome, SPA/API origin, restart, invalidation and logout; 6/7/8 remain unavailable")
+    print("HTTP application smoke passed: 12 cases, shared archive/extraction, ownership/CSRF, timeline/outcome, SPA/API origin, restart, invalidation and logout; real 6/8 connected; only 7 remains unavailable")
 
 
 if __name__ == "__main__":

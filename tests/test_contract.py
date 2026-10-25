@@ -42,7 +42,7 @@ def test_openapi_covers_contract_and_excludes_private_fields(client):
                 "$ref": "#/components/schemas/ErrorResponse"
             }
             if path != "/api/v1/health":
-                implemented = operation["x-package"] in {11, 2, 3, 4, 5, 9}
+                implemented = operation["x-package"] in {11, 2, 3, 4, 5, 6, 8, 9}
                 expected_state = "implemented" if implemented else "pending"
                 assert operation["x-implementation"] == expected_state
                 assert "503" in operation["responses"]
@@ -88,6 +88,9 @@ def test_unexpected_error_is_sanitized(settings):
     @application.get("/broken", include_in_schema=False)
     def broken():
         raise RuntimeError("password=private /local/secret.db")
+
+    # A late test-only route must precede the terminal frontend mount.
+    application.router.routes.insert(0, application.router.routes.pop())
 
     with TestClient(application, raise_server_exceptions=False) as client:
         response = client.get("/broken")

@@ -12,6 +12,11 @@ from app.ai import CodexCLIProvider
 from app.auth.service import AuthService
 from app.cases.router import router as cases_router
 from app.cases.service import CaseService
+from app.checks.engine import DocumentChecker
+from app.checks.integration import IntegratedChecksService
+from app.checks.router import router as checks_router
+from app.letters.router import router as letters_router
+from app.letters.service import LetterService
 from app.common.api import PACKAGE_NAMES, PENDING_ROUTERS
 from app.common.concurrency import ProcessingGuards
 from app.common.config import Settings
@@ -54,6 +59,8 @@ def create_app(
     installed.setdefault(3, profile_router)
     installed.setdefault(4, cases_router)
     installed.setdefault(5, documents_router)
+    installed.setdefault(6, checks_router)
+    installed.setdefault(8, letters_router)
     installed.setdefault(9, events_router)
     authentication = AuthService(database, config)
     registry = FileRuleRegistry()
@@ -71,8 +78,8 @@ def create_app(
     application = FastAPI(
         title="VisaPilot API", version="0.1.0", lifespan=lifespan,
         description=(
-            "Локальное демо на вымышленных документах. Работают аккаунты, 12 направлений, профиль/сравнения, дела, архив и ручная хронология (пакеты 1/11/2/3/4/5/9); "
-            "остальные маршруты документируют контракт и отвечают 503 после входа до реализации. "
+            "Локальное демо на вымышленных документах. Работают аккаунты, 12 направлений, профиль/сравнения, дела, архив, проверки, письма и ручная хронология (пакеты 1/11/2/3/4/5/6/8/9); "
+            "Маршрут/транзит (пакет 7) отвечает 503 после входа до подключения. "
             "Frontend использует один origin и credentials=include."
         ),
         responses=ERROR_RESPONSES,
@@ -85,6 +92,7 @@ def create_app(
     application.state.applicability_evaluator = EligibilityService(registry)
     archive = DocumentArchive(database, config, extractor=document_extractor)
     projector = EventProjector()
+    case_checker = case_checker if case_checker is not None else DocumentChecker()
     cases = CaseService(database, registry, application.state.applicability_evaluator,
                         document_service=archive, checker=case_checker, projector=projector)
     archive.rebuilder = case_rebuilder if case_rebuilder is not None else cases
@@ -99,6 +107,8 @@ def create_app(
         temporary_root=config.temporary_dir,
     )
     application.state.event_service = EventService(database, registry, application.state.applicability_evaluator)
+    application.state.checks_service = IntegratedChecksService(cases, case_checker)
+    application.state.letter_service = LetterService(database, cases, application.state.ai_provider, config.ai_timeout_seconds)
     application.state.auth_gateway = auth_gateway if auth_gateway is not None else authentication
     application.state.processing = ProcessingGuards()
     install_error_handlers(application)

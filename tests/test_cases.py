@@ -232,6 +232,7 @@ def test_profile_or_trip_change_invalidates_old_manual_confirmation(case_client)
 
 def test_revision_race_and_late_check_cannot_publish_old_positive(case_client):
     client, headers, owner = case_client
+    client.app.state.case_service.checker = None  # Isolate publication from automatic package 6.
     case = create_case(client, headers)
     service = client.app.state.case_service
     snapshot = service.snapshot(owner, UUID(case["id"]))

@@ -528,7 +528,7 @@ class LetterCreate(Model):
 
 
 class LetterPatch(Model):
-    content: str
+    content: str = PydanticField(min_length=1, max_length=32000)
 
 
 class Letter(Model):
