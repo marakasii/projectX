@@ -1,0 +1,32 @@
+{
+  "legs": [
+    {
+      "departure_country": "RU",
+      "arrival_country": "AE",
+      "departure_airport": "DME",
+      "arrival_airport": "DXB",
+      "departure_at": "2026-11-01T06:00:00Z",
+      "arrival_at": "2026-11-01T10:00:00Z"
+    },
+    {
+      "departure_country": "AE",
+      "arrival_country": "FR",
+      "departure_airport": "DXB",
+      "arrival_airport": "CDG",
+      "departure_at": "2026-11-01T12:00:00Z",
+      "arrival_at": "2026-11-01T15:00:00Z"
+    }
+  ],
+  "transfers": [
+    {
+      "country": "AE",
+      "airport": "DXB",
+      "arrival_at": "2026-11-01T10:00:00Z",
+      "departure_at": "2026-11-01T12:00:00Z",
+      "ticket_type": "single",
+      "leaves_airside": false,
+      "rechecks_baggage": false,
+      "permissions": null
+    }
+  ]
+}

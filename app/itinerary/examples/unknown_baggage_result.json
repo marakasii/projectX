@@ -1,0 +1,36 @@
+{
+  "status": "needs_verification",
+  "findings": [
+    {
+      "code": "transfer_facts_unknown",
+      "severity": "verify",
+      "message": "Условия пересадки неизвестны.",
+      "next_action": "Уточните время, билет, выход из зоны и получение багажа у перевозчика.",
+      "document_ids": [],
+      "field_paths": [
+        "route.transfers.0.rechecks_baggage"
+      ],
+      "rule_ref": null,
+      "source_refs": [],
+      "origin": "heuristic",
+      "resolved": false
+    },
+    {
+      "code": "route_scope_limited",
+      "severity": "info",
+      "message": "Проверка охватывает только указанные транзитные условия. Наличие рейсов и допуск к перевозке не проверены.",
+      "next_action": "Проверьте расписание, терминалы, регистрацию, минимальное время и условия назначения у перевозчика.",
+      "document_ids": [],
+      "field_paths": [],
+      "rule_ref": null,
+      "source_refs": [],
+      "origin": "heuristic",
+      "resolved": false
+    }
+  ],
+  "covered_countries": [],
+  "uncovered_countries": [
+    "AE"
+  ],
+  "flight_availability": "not_checked"
+}
