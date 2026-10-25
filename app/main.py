@@ -8,15 +8,24 @@ from fastapi.openapi.utils import get_openapi
 from starlette.concurrency import run_in_threadpool
 
 from app.auth.router import router as auth_router
+from app.ai import CodexCLIProvider
 from app.auth.service import AuthService
+from app.cases.router import router as cases_router
+from app.cases.service import CaseService
 from app.common.api import PACKAGE_NAMES, PENDING_ROUTERS
 from app.common.concurrency import ProcessingGuards
 from app.common.config import Settings
 from app.common.db import SCHEMA_VERSION, Database
 from app.common.errors import AppError, ERROR_RESPONSES, install_error_handlers
-from app.common.interfaces import AuthGateway
+from app.common.interfaces import AIProvider, AuthGateway
 from app.common.models import Health
+from app.common.web import install_web
 from app.eligibility.service import EligibilityService
+from app.documents.router import router as documents_router
+from app.documents.service import DocumentArchive
+from app.events.router import router as events_router
+from app.events.service import EventService
+from app.events.projection import EventProjector
 from app.profile.router import router as profile_router
 from app.profile.service import ProfileService
 from app.rules.registry import FileRuleRegistry
@@ -30,6 +39,10 @@ def create_app(
     *,
     feature_routers: Mapping[int, APIRouter] | None = None,
     auth_gateway: AuthGateway | None = None,
+    document_extractor=None,
+    case_checker=None,
+    case_rebuilder=None,
+    ai_provider: AIProvider | None = None,
 ) -> FastAPI:
     config = settings if settings is not None else Settings()
     database = Database(config.database_path)
@@ -39,6 +52,9 @@ def create_app(
     installed.setdefault(11, auth_router)
     installed.setdefault(2, rules_router)
     installed.setdefault(3, profile_router)
+    installed.setdefault(4, cases_router)
+    installed.setdefault(5, documents_router)
+    installed.setdefault(9, events_router)
     authentication = AuthService(database, config)
     registry = FileRuleRegistry()
 
@@ -55,7 +71,7 @@ def create_app(
     application = FastAPI(
         title="VisaPilot API", version="0.1.0", lifespan=lifespan,
         description=(
-            "Локальное демо на вымышленных документах. Работают health, аккаунты/сессии, реестр 12 направлений и профиль/сравнения (пакеты 1/11/2/3); "
+            "Локальное демо на вымышленных документах. Работают аккаунты, 12 направлений, профиль/сравнения, дела, архив и ручная хронология (пакеты 1/11/2/3/4/5/9); "
             "остальные маршруты документируют контракт и отвечают 503 после входа до реализации. "
             "Frontend использует один origin и credentials=include."
         ),
@@ -67,6 +83,22 @@ def create_app(
     application.state.rule_registry = registry
     application.state.profile_service = ProfileService(database)
     application.state.applicability_evaluator = EligibilityService(registry)
+    archive = DocumentArchive(database, config, extractor=document_extractor)
+    projector = EventProjector()
+    cases = CaseService(database, registry, application.state.applicability_evaluator,
+                        document_service=archive, checker=case_checker, projector=projector)
+    archive.rebuilder = case_rebuilder if case_rebuilder is not None else cases
+    application.state.document_archive = archive
+    application.state.document_service = archive
+    application.state.case_service = cases
+    application.state.case_rebuilder = cases
+    application.state.process_projector = projector
+    application.state.case_checker = case_checker
+    application.state.ai_provider = ai_provider if ai_provider is not None else CodexCLIProvider(
+        enabled=config.ai_enabled, model=config.ai_model, timeout_seconds=min(config.ai_timeout_seconds, 60),
+        temporary_root=config.temporary_dir,
+    )
+    application.state.event_service = EventService(database, registry, application.state.applicability_evaluator)
     application.state.auth_gateway = auth_gateway if auth_gateway is not None else authentication
     application.state.processing = ProcessingGuards()
     install_error_handlers(application)
@@ -97,6 +129,7 @@ def create_app(
         return application.openapi_schema
 
     application.openapi = openapi
+    install_web(application, config)
     return application
 
 

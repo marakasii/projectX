@@ -208,3 +208,37 @@ answers принимает только типизированные questions �
 вопросы и порт evaluate_applicability: [profile-handoff.md](profile-handoff.md).
 Внутренние get_scenario/get_sources допускают keyword version для чтения
 сохранённой версии вместе с get_ruleset(version).
+
+## Конкретизация пакетов 4/9 и общего запуска
+
+CRUD /cases, привязка/отвязка документов, ручные отметки checklist,
+events и notifications реализованы в общем app.main. Архив 5 тоже
+подключён по умолчанию, отдельная фабрика совместимо делегирует общей.
+Case дополнен необязательным applicability, ChecklistItem — title.
+PATCH trip/answers объединяет переданные поля/ключи; null внутри объекта
+означает неизвестное, null вместо самого объекта — 422. Идентичная запись
+не увеличивает ревизию. Детали подписей/переоценки — в handoff ниже.
+
+Ручной checklist confirmed разрешён только для применимого
+preparation_action. Документ требует подтверждённых ключей и актуальной
+проверки 6. Без неё нет фиктивного satisfied; HTTP checks/route/letters
+пакетов 6/7/8 по-прежнему честно возвращают 503. Пустой/неизвестный
+знаменатель готовности — null, ready=false. Все реальные наборы partial.
+
+EventCreate.note ограничен 4000 символами. occurred_at не может быть в
+будущем, требует часовой пояс. source/id/received_at/case_id назначает сервер.
+decision_received требует approved/refused; outcome у иных событий запрещён.
+passport_returned сам не задаёт исход и не подтверждает ранние этапы.
+В безвизовой ветке нет submitted/decision_received. Notifications —
+текущие внутренние сообщения/действия, без внешней доставки.
+
+ProcessProjector принимает необязательные context/unverified_source_ids
+для условий и качества этапов. CaseService.snapshot/record_check — порт
+будущей проверки 6; поздняя подпись даёт 409. Общий AIProvider доступен
+через app.state.ai_provider, по умолчанию выключен без startup-вызова.
+
+Готовый frontend может обслуживаться тем же сервером из frontend/dist или
+VISAPILOT_FRONTEND_DIST. При отсутствии сборки / открывает /docs;
+эти веб-маршруты не входят в API-снимок. Приватные данные не публикуются
+как статика. Полные примеры и границы готовности:
+[cases-events-handoff.md](cases-events-handoff.md).

@@ -13,7 +13,7 @@ import httpx
 
 
 @contextmanager
-def server(port, data_dir):
+def server(port, data_dir, *, environment_overrides=None):
     origin = f"http://127.0.0.1:{port}"
     environment = {
         **os.environ,
@@ -22,6 +22,7 @@ def server(port, data_dir):
         "VISAPILOT_COOKIE_SECURE": "false",
         "VISAPILOT_SESSION_COOKIE_NAME": "visapilot_session",
         "VISAPILOT_SESSION_TTL_SECONDS": "43200",
+        **(environment_overrides or {}),
     }
     process = subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1",

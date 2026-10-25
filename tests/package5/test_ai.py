@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import shlex
 import sys
 from pathlib import Path
 
@@ -19,7 +20,8 @@ def fake_cli(tmp_path):
               exit_code=0, delay=0):
         path = tmp_path / "fake-codex"
         log = tmp_path / "fixture-calls.jsonl"
-        path.write_text(f'''#!{sys.executable}
+        script = tmp_path / "fake-codex.py"
+        script.write_text(f'''
 import sys, pathlib, json, os, time
 args = sys.argv[1:]
 time.sleep({delay!r})
@@ -34,6 +36,8 @@ if {exit_code!r}:
     raise SystemExit({exit_code!r})
 pathlib.Path(args[args.index("--output-last-message") + 1]).write_text({output!r})
 ''', encoding="utf-8")
+        # macOS/Linux shebangs cannot contain an interpreter path with spaces.
+        path.write_text("#!/bin/sh\nexec " + shlex.quote(sys.executable) + " " + shlex.quote(str(script)) + ' "$@"\n', encoding="utf-8")
         path.chmod(0o700)
         return CodexCLIProvider(enabled=True, model="fixture-model-not-real", executable=str(path), temporary_root=tmp_path), log
     return build

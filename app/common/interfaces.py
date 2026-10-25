@@ -71,4 +71,5 @@ class LetterGenerator(Protocol):
 class ProcessProjector(Protocol):
     def project_process(
         self, events: list[Event], process_template: list[ProcessStageTemplate],
+        *, context: dict | None = None, unverified_source_ids: list[str] | tuple[str, ...] = (),
     ) -> Process: ...

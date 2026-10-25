@@ -72,3 +72,23 @@ def validate_answers(answers, questions):
             "fields": [f"answers.{key}" for key in sorted(invalid)],
         })
     return result
+
+
+def answers_for_current_schema(saved_answers, questions):
+    """Read older persisted answers without losing the original JSON on disk.
+
+    New HTTP writes still use strict validate_answers. Retired or changed
+    questions require review; an old value cannot silently prove a new rule.
+    """
+    compatible, changed = {}, []
+    for key, value in saved_answers.items():
+        if key not in questions:
+            changed.append("answers." + key)
+            continue
+        try:
+            validate_answers({key: value}, questions)
+            compatible[key] = value
+        except AppError:
+            compatible[key] = None
+            changed.append("answers." + key)
+    return compatible, sorted(changed)

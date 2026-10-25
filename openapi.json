@@ -372,24 +372,6 @@
         "title": "AppliedRequirement",
         "type": "object"
       },
-      "Body_upload_document_api_v1_documents_post": {
-        "properties": {
-          "document_type": {
-            "$ref": "#/components/schemas/DocumentType"
-          },
-          "file": {
-            "contentMediaType": "application/octet-stream",
-            "title": "File",
-            "type": "string"
-          }
-        },
-        "required": [
-          "file",
-          "document_type"
-        ],
-        "title": "Body_upload_document_api_v1_documents_post",
-        "type": "object"
-      },
       "Case": {
         "additionalProperties": false,
         "properties": {
@@ -399,6 +381,16 @@
             },
             "title": "Answers",
             "type": "object"
+          },
+          "applicability": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicabilityResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "attached_document_ids": {
             "items": {
@@ -656,6 +648,11 @@
           },
           "state": {
             "$ref": "#/components/schemas/ChecklistState"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
           },
           "verification_method": {
             "anyOf": [
@@ -1092,6 +1089,7 @@
           "note": {
             "anyOf": [
               {
+                "maxLength": 4000,
                 "type": "string"
               },
               {
@@ -1146,6 +1144,7 @@
           "note": {
             "anyOf": [
               {
+                "maxLength": 4000,
                 "type": "string"
               },
               {
@@ -2907,7 +2906,7 @@
     }
   },
   "info": {
-    "description": "Локальное демо на вымышленных документах. Работают health, аккаунты/сессии, реестр 12 направлений и профиль/сравнения (пакеты 1/11/2/3); остальные маршруты документируют контракт и отвечают 503 после входа до реализации. Frontend использует один origin и credentials=include.",
+    "description": "Локальное демо на вымышленных документах. Работают аккаунты, 12 направлений, профиль/сравнения, дела, архив и ручная хронология (пакеты 1/11/2/3/4/5/9); остальные маршруты документируют контракт и отвечают 503 после входа до реализации. Frontend использует один origin и credentials=include.",
     "title": "VisaPilot API",
     "version": "0.1.0"
   },
@@ -3432,8 +3431,7 @@
     },
     "/api/v1/cases": {
       "get": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "cases_api_v1_cases_get",
+        "operationId": "listing_api_v1_cases_get",
         "responses": {
           "200": {
             "content": {
@@ -3541,16 +3539,15 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Cases",
+        "summary": "Listing",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       },
       "post": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "create_case_api_v1_cases_post",
+        "operationId": "create_api_v1_cases_post",
         "parameters": [
           {
             "in": "header",
@@ -3686,18 +3683,17 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Create Case",
+        "summary": "Create",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       }
     },
     "/api/v1/cases/{case_id}": {
       "delete": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "delete_case_api_v1_cases__case_id__delete",
+        "operationId": "delete_api_v1_cases__case_id__delete",
         "parameters": [
           {
             "in": "path",
@@ -3826,16 +3822,15 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Delete Case",
+        "summary": "Delete",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       },
       "get": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "case_api_v1_cases__case_id__get",
+        "operationId": "get_api_v1_cases__case_id__get",
         "parameters": [
           {
             "in": "path",
@@ -3955,16 +3950,15 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Case",
+        "summary": "Get",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       },
       "patch": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "update_case_api_v1_cases__case_id__patch",
+        "operationId": "update_api_v1_cases__case_id__patch",
         "parameters": [
           {
             "in": "path",
@@ -4110,18 +4104,17 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Update Case",
+        "summary": "Update",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       }
     },
     "/api/v1/cases/{case_id}/checklist/{item_id}": {
       "patch": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "checklist_action_api_v1_cases__case_id__checklist__item_id__patch",
+        "operationId": "confirm_api_v1_cases__case_id__checklist__item_id__patch",
         "parameters": [
           {
             "in": "path",
@@ -4276,11 +4269,11 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Checklist Action",
+        "summary": "Confirm",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       }
     },
@@ -4562,8 +4555,7 @@
     },
     "/api/v1/cases/{case_id}/documents/{document_id}": {
       "delete": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "detach_document_api_v1_cases__case_id__documents__document_id__delete",
+        "operationId": "detach_api_v1_cases__case_id__documents__document_id__delete",
         "parameters": [
           {
             "in": "path",
@@ -4702,16 +4694,15 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Detach Document",
+        "summary": "Detach",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       },
       "put": {
-        "description": "Контракт пакета 4. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "attach_document_api_v1_cases__case_id__documents__document_id__put",
+        "operationId": "attach_api_v1_cases__case_id__documents__document_id__put",
         "parameters": [
           {
             "in": "path",
@@ -4857,18 +4848,17 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Attach Document",
+        "summary": "Attach",
         "tags": [
           "cases"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 4
       }
     },
     "/api/v1/cases/{case_id}/events": {
       "get": {
-        "description": "Контракт пакета 9. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "events_api_v1_cases__case_id__events_get",
+        "operationId": "list_events_api_v1_cases__case_id__events_get",
         "parameters": [
           {
             "in": "path",
@@ -4988,15 +4978,14 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Events",
+        "summary": "List Events",
         "tags": [
           "events"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 9
       },
       "post": {
-        "description": "Контракт пакета 9. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "create_event_api_v1_cases__case_id__events_post",
         "parameters": [
           {
@@ -5147,7 +5136,7 @@
         "tags": [
           "events"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 9
       }
     },
@@ -5439,7 +5428,6 @@
     },
     "/api/v1/cases/{case_id}/notifications": {
       "get": {
-        "description": "Контракт пакета 9. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "notifications_api_v1_cases__case_id__notifications_get",
         "parameters": [
           {
@@ -5564,7 +5552,7 @@
         "tags": [
           "events"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 9
       }
     },
@@ -6134,7 +6122,6 @@
     },
     "/api/v1/documents": {
       "get": {
-        "description": "Контракт пакета 5. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "documents_api_v1_documents_get",
         "responses": {
           "200": {
@@ -6247,11 +6234,10 @@
         "tags": [
           "documents"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 5
       },
       "post": {
-        "description": "Контракт пакета 5. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "upload_document_api_v1_documents_post",
         "parameters": [
           {
@@ -6275,7 +6261,21 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Body_upload_document_api_v1_documents_post"
+                "additionalProperties": false,
+                "properties": {
+                  "document_type": {
+                    "$ref": "#/components/schemas/DocumentType"
+                  },
+                  "file": {
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file",
+                  "document_type"
+                ],
+                "type": "object"
               }
             }
           },
@@ -6392,13 +6392,12 @@
         "tags": [
           "documents"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 5
       }
     },
     "/api/v1/documents/{document_id}": {
       "delete": {
-        "description": "Контракт пакета 5. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "delete_document_api_v1_documents__document_id__delete",
         "parameters": [
           {
@@ -6532,11 +6531,10 @@
         "tags": [
           "documents"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 5
       },
       "get": {
-        "description": "Контракт пакета 5. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "document_api_v1_documents__document_id__get",
         "parameters": [
           {
@@ -6661,13 +6659,12 @@
         "tags": [
           "documents"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 5
       }
     },
     "/api/v1/documents/{document_id}/extract": {
       "post": {
-        "description": "Контракт пакета 5. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "extract_document_api_v1_documents__document_id__extract_post",
         "parameters": [
           {
@@ -6808,14 +6805,13 @@
         "tags": [
           "documents"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 5
       }
     },
     "/api/v1/documents/{document_id}/fields": {
       "patch": {
-        "description": "Контракт пакета 5. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
-        "operationId": "confirm_fields_api_v1_documents__document_id__fields_patch",
+        "operationId": "patch_fields_api_v1_documents__document_id__fields_patch",
         "parameters": [
           {
             "in": "path",
@@ -6961,17 +6957,16 @@
             "SessionCookie": []
           }
         ],
-        "summary": "Confirm Fields",
+        "summary": "Patch Fields",
         "tags": [
           "documents"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 5
       }
     },
     "/api/v1/documents/{document_id}/file": {
       "get": {
-        "description": "Контракт пакета 5. Реализация отсутствует: сейчас возвращает 503 module_not_ready. Указанный успешный ответ — целевой интерфейс.",
         "operationId": "download_document_api_v1_documents__document_id__file_get",
         "parameters": [
           {
@@ -6995,7 +6990,7 @@
                 }
               }
             },
-            "description": "Защищённое скачивание после реализации пакета"
+            "description": "Скачать свой оригинал"
           },
           "401": {
             "content": {
@@ -7097,7 +7092,7 @@
         "tags": [
           "documents"
         ],
-        "x-implementation": "pending",
+        "x-implementation": "implemented",
         "x-package": 5
       }
     },
