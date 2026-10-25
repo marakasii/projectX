@@ -4,10 +4,17 @@ from fastapi.testclient import TestClient
 from app.main import create_app
 
 
-def test_without_frontend_root_opens_live_swagger(client):
+def test_without_frontend_root_opens_live_swagger(settings, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/", follow_redirects=False)
+        assert response.status_code == 307 and response.headers["location"] == "/docs"
+        assert client.get("/").status_code == 200
+
+
+def test_existing_frontend_is_served(client):
     response = client.get("/", follow_redirects=False)
-    assert response.status_code == 307 and response.headers["location"] == "/docs"
-    assert client.get("/").status_code == 200
+    assert response.status_code == 200 and '<html' in response.text
 
 
 def test_frontend_bundle_api_spa_refresh_and_private_paths(settings, tmp_path):

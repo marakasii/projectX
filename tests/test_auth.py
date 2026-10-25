@@ -232,9 +232,9 @@ def test_feature_and_pending_routes_require_real_session_and_csrf(client):
         json={"scenario_id": "JP_TOURISM", "trip": {}},
     )
     assert response.status_code == 201
-    pending = client.post(f"/api/v1/cases/{response.json()['id']}/checks", headers={"X-CSRF-Token": payload["csrf_token"]})
+    pending = client.post(f"/api/v1/cases/{response.json()['id']}/route/check", headers={"X-CSRF-Token": payload["csrf_token"]})
     assert pending.status_code == 503
-    assert pending.json()["error"]["details"] == {"package": 6}
+    assert pending.json()["error"]["details"] == {"package": 7}
 
 
 def test_hashing_does_not_block_health(client, monkeypatch):

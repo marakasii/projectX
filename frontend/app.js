@@ -140,7 +140,7 @@ function authPage() {
 
 function profilePage() {
   const p = state.profile || {};
-  return workspace('Профиль заявителя','Общие данные для ваших дел.',`${sampleWarning()}<form class="surface-card form-card" data-form="profile"><div class="form-section-title"><h2>Личные данные</h2><p>Сценарий рассчитан на совершеннолетнего туриста из РФ с обычным загранпаспортом.</p></div><div class="form-grid"><label class="form-field">Имя<input name="given_name" value="${esc(p.given_name||'')}" required></label><label class="form-field">Фамилия<input name="surname" value="${esc(p.surname||'')}" required></label><label class="form-field">Дата рождения<input type="date" name="birth_date" value="${esc(p.birth_date||'')}"></label><label class="form-field">Тип загранпаспорта<select name="passport_kind"><option value="" ${!p.passport_kind?'selected':''}>Неизвестно</option><option value="biometric" ${p.passport_kind==='biometric'?'selected':''}>Биометрический</option><option value="non_biometric" ${p.passport_kind==='non_biometric'?'selected':''}>Небиометрический</option></select></label><label class="form-field">Дата выдачи паспорта<input type="date" name="passport_issued_on" value="${esc(p.passport_issued_on||'')}"></label><label class="form-field">Срок действия паспорта<input type="date" name="passport_expires_on" value="${esc(p.passport_expires_on||'')}"></label></div><div class="form-actions"><button class="button button-primary" type="submit">Сохранить профиль</button><a class="button button-outline" href="#/compare">Перейти к сравнению</a></div></form>`, '/profile');
+  return workspace('Профиль заявителя','Общие данные для ваших дел.',`${sampleWarning()}<form class="surface-card form-card" data-form="profile"><div class="form-section-title"><h2>Личные данные</h2><p>Сценарий рассчитан на совершеннолетнего туриста из РФ с обычным загранпаспортом.</p></div><div class="form-grid"><label class="form-field">Имя<input name="given_name" value="${esc(p.given_name||'')}" required></label><label class="form-field">Фамилия<input name="surname" value="${esc(p.surname||'')}" required></label><label class="form-field">Дата рождения<input type="date" name="birth_date" value="${esc(p.birth_date||'')}"></label><label class="form-field">Тип загранпаспорта<select name="passport_kind"><option value="" ${!p.passport_kind?'selected':''}>Неизвестно</option><option value="biometric" ${p.passport_kind==='biometric'?'selected':''}>Биометрический</option><option value="non_biometric" ${p.passport_kind==='non_biometric'?'selected':''}>Небиометрический</option></select></label><label class="form-field">Дата выдачи паспорта<input type="date" name="passport_issued_on" value="${esc(p.passport_issued_on||'')}"></label><label class="form-field">Срок действия паспорта<input type="date" name="passport_expires_on" value="${esc(p.passport_expires_on||'')}"></label><label class="form-field">Второе гражданство<select name="has_other_citizenship">${unknownOptions(p.has_other_citizenship)}</select></label><label class="form-field">Иностранный ВНЖ<select name="has_foreign_residence_permit">${unknownOptions(p.has_foreign_residence_permit)}</select></label></div><div class="form-actions"><button class="button button-primary" type="submit">Сохранить профиль</button><a class="button button-outline" href="#/compare">Перейти к сравнению</a></div></form>`, '/profile');
 }
 
 function unknownOptions(value) { return `<option value="unknown" ${value==null?'selected':''}>Неизвестно</option><option value="no" ${value===false?'selected':''}>Нет</option><option value="yes" ${value===true?'selected':''}>Да</option>`; }
@@ -225,7 +225,7 @@ const eventNames = { form_prepared:'Анкета подготовлена', appo
 function timelinePage(id) {
   const item = state.case;
   if (!item) return notFound();
-  return workspace('Хронология дела','События добавляются вручную. Это не доступ к внутреннему статусу консульства.',`${sampleWarning()}${caseTabs(id,'/timeline')}<div class="workspace-columns timeline-grid"><section class="surface-card inner-card"><h2>События</h2>${state.events.length?`<ol class="timeline">${state.events.map(event=>`<li><time>${dateText(event.occurred_at)}</time><div><strong>${esc(eventNames[event.event_type]||event.event_type)}</strong><p>${esc(event.note||'Без комментария')}</p><small>Источник: ${esc(event.source||'manual')}</small></div></li>`).join('')}</ol>`:empty('Событий пока нет','Добавьте этап, который действительно произошёл.')}</section><section class="surface-card inner-card"><h2>Добавить событие</h2><form data-form="event" data-id="${esc(id)}"><label class="form-field">Тип события<select name="event_type">${Object.entries(eventNames).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></label><label class="form-field">Дата события<input name="occurred_at" type="date" value="${new Date().toISOString().slice(0,10)}" required></label><label class="form-field">Комментарий<textarea name="note" rows="4" placeholder="Только фактически произошедшее"></textarea></label><button class="button button-primary full" type="submit">Добавить вручную</button></form><h2 class="block-gap">Внутренние уведомления</h2>${state.notifications.length?state.notifications.map(n=>`<div class="notification-row">${icon('info')}<span>${esc(n.message||n.title||'Уведомление')}</span></div>`).join(''):'<p class="small-muted">Новых уведомлений нет.</p>'}</section></div>`, '/cases');
+  return workspace('Хронология дела','События добавляются вручную. Это не доступ к внутреннему статусу консульства.',`${sampleWarning()}${caseTabs(id,'/timeline')}<div class="workspace-columns timeline-grid"><section class="surface-card inner-card"><h2>События</h2>${state.events.length?`<ol class="timeline">${state.events.map(event=>`<li><time>${dateText(event.occurred_at)}</time><div><strong>${esc(eventNames[event.event_type]||event.event_type)}</strong><p>${esc(event.note||'Без комментария')}</p><small>Источник: ${esc(event.source||'manual')}</small></div></li>`).join('')}</ol>`:empty('Событий пока нет','Добавьте этап, который действительно произошёл.')}</section><section class="surface-card inner-card"><h2>Добавить событие</h2><form data-form="event" data-id="${esc(id)}"><label class="form-field">Тип события<select name="event_type">${Object.entries(eventNames).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></label><label class="form-field">Дата события<input name="occurred_at" type="date" value="${new Date().toISOString().slice(0,10)}" required></label><label class="form-field">Исход (для полученного решения)<select name="outcome"><option value="">Неизвестно</option><option value="approved">Одобрено</option><option value="refused">Отказ</option></select></label><label class="form-field">Комментарий<textarea name="note" rows="4" placeholder="Только фактически произошедшее"></textarea></label><button class="button button-primary full" type="submit">Добавить вручную</button></form><h2 class="block-gap">Внутренние уведомления</h2>${state.notifications.length?state.notifications.map(n=>`<div class="notification-row">${icon('info')}<span>${esc(n.message||n.title||'Уведомление')}</span></div>`).join(''):'<p class="small-muted">Новых уведомлений нет.</p>'}</section></div>`, '/cases');
 }
 
 function aboutPage() {
@@ -399,7 +399,8 @@ async function submitAuth(form) {
 
 function nullableChoice(value) { return value==='unknown'?null:value==='yes'; }
 async function submitProfile(form) {
-  const data={...Object.fromEntries(new FormData(form)),citizenship:'RU',residence_country:'RU',has_other_citizenship:state.profile?.has_other_citizenship??null,has_foreign_residence_permit:state.profile?.has_foreign_residence_permit??null};
+  const data={...Object.fromEntries(new FormData(form)),citizenship:'RU',residence_country:'RU',};
+  for (const key of ['has_other_citizenship','has_foreign_residence_permit']) data[key]=nullableChoice(data[key] || 'unknown');
   for (const key of ['birth_date','passport_kind','passport_issued_on','passport_expires_on']) if (!data[key]) data[key]=null;
   if (state.mode==='api') state.profile=await api.saveProfile(data);
   else state.profile={...state.profile,...data};
@@ -462,7 +463,7 @@ async function uploadDocument(form) {
 async function saveFields(form) {
   const doc=state.document;
   const fields=listItems(doc.fields).map((field,index)=>({...field,value:form.querySelector(`[name="field-${index}"]`).value,user_confirmed:form.querySelector(`[name="confirm-${index}"]`).checked}));
-  if (state.mode==='api') await api.updateFields(form.dataset.id,fields);
+  if (state.mode==='api') await api.updateFields(form.dataset.id,fields,doc.facts_revision);
   else {doc.fields=fields;doc.facts_revision=(doc.facts_revision||0)+1;doc.extraction_state='extracted';}
   toast('Поля сохранены. Проверьте дело повторно.','success'); await navigate();
 }
@@ -512,6 +513,15 @@ async function downloadDocument(docId) {
   const blob=await response.blob();const url=URL.createObjectURL(blob);window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 
+async function downloadPrivateFile(path, filename) {
+  const response = await fetch(path, {credentials:'include'});
+  if (!response.ok) throw new ApiError('Не удалось скачать файл.', response.status);
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement('a');
+  link.href = url; link.download = filename; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
 async function submitRoute(form) {
   const data=Object.fromEntries(new FormData(form));
   const transfer=data.country==='none'?[]:[{country:data.country,airport:data.airport||null,arrival_at:data.arrival_at?new Date(data.arrival_at).toISOString():null,departure_at:data.departure_at?new Date(data.departure_at).toISOString():null,ticket_type:data.ticket_type==='unknown'?null:data.ticket_type,leaves_airside:nullableChoice(data.leaves_airside),rechecks_baggage:nullableChoice(data.rechecks_baggage),permissions:data.permissions||null}];
@@ -541,6 +551,7 @@ async function saveLetter(form) {
 }
 
 async function downloadLetter(letterId) {
+  if (state.mode==='api') { await downloadPrivateFile(`/api/v1/letters/${encodeURIComponent(letterId)}/file`, 'VisaMate-cover-letter.txt'); return; }
   const letter=state.letter || state.demo.letters.find(l=>l.id===letterId);
   if (!letter) return;
   const blob=new Blob([letter.content||''],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -549,7 +560,8 @@ async function downloadLetter(letterId) {
 
 async function addEvent(form) {
   const data=Object.fromEntries(new FormData(form));
-  const body={event_type:data.event_type,occurred_at:new Date(`${data.occurred_at}T12:00:00`).toISOString(),source:'manual',note:data.note||''};
+  const body={event_type:data.event_type,occurred_at:new Date(`${data.occurred_at}T12:00:00`).toISOString(),note:data.note||''};
+  if (data.event_type==='decision_received' && data.outcome) body.outcome=data.outcome;
   if (state.mode==='api') await api.addEvent(form.dataset.id,body);
   else state.demo.events.unshift({id:`demo-event-${Date.now()}`,case_id:form.dataset.id,...body});
   toast('Событие добавлено вручную.','success'); await navigate();

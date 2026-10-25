@@ -172,7 +172,7 @@ class CaseService:
             raise AppError(409, "input_changed", "Документы изменились во время чтения. Повторите запрос.")
         signature = InputSignature(
             case_revision=row["revision"], profile_revision=profile.revision, facts_revisions=revisions,
-            ruleset_version=scenario.version, algorithm_version=ALGORITHM_VERSION, route_revision=state["route_revision"],
+            ruleset_version=scenario.version, algorithm_version=getattr(self.checker, 'algorithm_version', ALGORITHM_VERSION), route_revision=state["route_revision"],
         )
         applicability = self.evaluator.evaluate_applicability(profile, trip, answers, scenario)
         if changed_answers:
@@ -197,7 +197,7 @@ class CaseService:
             candidate = CheckResult(id=saved["id"], case_id=case_id, evaluated_at=saved["evaluated_at"],
                                     input_signature=InputSignature.model_validate_json(saved["input_signature_json"]),
                                     findings=FINDINGS.validate_json(saved["findings_json"]), stale=bool(saved["stale"]))
-            if not candidate.stale and candidate.input_signature == signature:
+            if not candidate.stale and candidate.input_signature == signature and candidate.evaluated_at.date() == datetime.now(timezone.utc).date():
                 check = candidate
         case = Case(
             id=case_id, scenario_id=scenario.id, trip=trip, answers=answers,

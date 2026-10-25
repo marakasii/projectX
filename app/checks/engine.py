@@ -43,6 +43,7 @@ def signature(snapshot: CaseSnapshot) -> InputSignature:
         case_revision=snapshot.case.revision, profile_revision=snapshot.profile.revision,
         facts_revisions={doc.document_id: doc.facts_revision for doc in snapshot.documents},
         ruleset_version=snapshot.ruleset.version, algorithm_version=ALGORITHM_VERSION,
+        route_revision=snapshot.input_signature.route_revision,
     )
 
 
