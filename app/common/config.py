@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     demo_mode: bool = True
     data_dir: Path = Path("local_data")
+    frontend_dist: Path | None = None
     allowed_origins: list[str] = ["http://127.0.0.1:8000", "http://localhost:8000"]
     cookie_secure: bool = False
     session_cookie_name: str = "visapilot_session"
@@ -22,6 +23,8 @@ class Settings(BaseSettings):
     max_image_pixels: int = Field(default=20_000_000, gt=0)
     document_timeout_seconds: int = Field(default=60, gt=0)
     ai_timeout_seconds: int = Field(default=60, gt=0)
+    ai_enabled: bool = False
+    ai_model: str | None = None
 
     @property
     def database_path(self) -> Path:

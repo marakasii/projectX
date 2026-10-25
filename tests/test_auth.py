@@ -219,20 +219,22 @@ def test_secure_cookie_and_custom_name(settings):
         assert scheme["name"] == "custom_session"
 
 
-def test_pending_protected_routes_require_real_session_and_csrf(client):
+def test_feature_and_pending_routes_require_real_session_and_csrf(client):
     assert client.get("/api/v1/documents").status_code == 401
     assert client.get("/api/v1/cases").status_code == 401
     assert client.post("/api/v1/cases", json={}).status_code == 401
     register(client)
     payload = login(client).json()
-    assert client.get("/api/v1/documents").status_code == 503
+    assert client.get("/api/v1/documents").json() == {"items": []}
     assert client.post("/api/v1/cases", json={}).status_code == 403
     response = client.post(
         "/api/v1/cases", headers={"X-CSRF-Token": payload["csrf_token"]},
-        json={"scenario_id": "FIXTURE", "trip": {}},
+        json={"scenario_id": "JP_TOURISM", "trip": {}},
     )
-    assert response.status_code == 503
-    assert response.json()["error"]["details"] == {"package": 4}
+    assert response.status_code == 201
+    pending = client.post(f"/api/v1/cases/{response.json()['id']}/checks", headers={"X-CSRF-Token": payload["csrf_token"]})
+    assert pending.status_code == 503
+    assert pending.json()["error"]["details"] == {"package": 6}
 
 
 def test_hashing_does_not_block_health(client, monkeypatch):
